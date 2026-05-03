@@ -2,6 +2,8 @@ from PySide6.QtWidgets import QFileDialog, QMessageBox
 from views.main_window import MainWindow
 from models.model import AthleteModel, Athlete
 from views.add_dialog import AddAthleteDialog
+from views.search_dialog import SearchDialog
+from views.delete_dialog import DeleteDialog
 
 class MainController:
     def __init__(self, view: MainWindow, model: AthleteModel):
@@ -21,6 +23,8 @@ class MainController:
         self.view.action_add.triggered.connect(self.handle_add_record)
         self.view.action_save.triggered.connect(self.handle_save_file)
         self.view.action_load.triggered.connect(self.handle_load_file)
+        self.view.action_search.triggered.connect(self.handle_search)
+        self.view.action_delete.triggered.connect(self.handle_delete)
         
         # Сигналы пагинации
         self.view.btn_next.clicked.connect(self.next_page)
@@ -107,3 +111,52 @@ class MainController:
         self.items_per_page = int(text)
         self.current_page = 1  # Сбрасываем на первую страницу
         self.update_table_view()
+
+    def _get_unique_dropdown_data(self):
+        """Вспомогательный метод для сбора уникальных видов спорта и разрядов (Требование задания)"""
+        all_athletes = self.model.get_all()
+        # Используем set, чтобы убрать дубликаты
+        unique_sports = list(set([a.sport_type for a in all_athletes if a.sport_type]))
+        unique_ranks = list(set([a.rank for a in all_athletes if a.rank]))
+        return sorted(unique_sports), sorted(unique_ranks)
+
+    def handle_search(self):
+        # 1. Собираем уникальные данные из модели
+        sports, ranks = self._get_unique_dropdown_data()
+        
+        # 2. Создаем диалог
+        dialog = SearchDialog(self.view, sports, ranks)
+        
+        # 3. Определяем, что делать при нажатии кнопки "Найти" внутри диалога
+        def perform_search():
+            params = dialog.get_search_params()
+            results = self.model.search(**params) # Вызываем универсальный метод поиска из Модели
+            dialog.set_results(results) # Передаем результаты обратно в диалог для отображения
+            
+        dialog.btn_search.clicked.connect(perform_search)
+        
+        # Запускаем окно (оно не закроется, пока пользователь сам не нажмет крестик)
+        dialog.exec()
+
+    def handle_delete(self):
+        sports, ranks = self._get_unique_dropdown_data()
+        dialog = DeleteDialog(self.view, sports, ranks)
+        
+        if dialog.exec(): # Если пользователь нажал "ОК"
+            params = dialog.get_delete_params()
+            
+            # Сначала ИЩЕМ записи, которые подходят под критерии
+            records_to_delete = self.model.search(**params)
+            
+            if not records_to_delete:
+                QMessageBox.information(self.view, "Отчет", "Записи по заданным условиям не найдены.")
+                return
+                
+            # Просим модель УДАЛИТЬ найденные записи
+            deleted_count = self.model.delete_records(records_to_delete)
+            
+            # Строгое требование задания: сообщить, сколько было удалено
+            QMessageBox.information(self.view, "Успех", f"Успешно удалено записей: {deleted_count}")
+            
+            # Обновляем главную таблицу
+            self.update_table_view()
