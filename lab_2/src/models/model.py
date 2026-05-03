@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from typing import List, Optional
-from xml_manager import save_athletes_to_xml, load_athletes_from_xml
+
 
 @dataclass
 class Athlete:
@@ -29,9 +29,13 @@ class AthleteModel:
         self._athletes.append([])
 
     def save_to_file(self, filepath: str):
+        # Импортируем только тогда, когда метод вызывается
+        from models.xml_manager import save_athletes_to_xml
         save_athletes_to_xml(filepath, self._athletes)
 
     def load_from_file(self, filepath: str):
+        # Импортируем только тогда, когда метод вызывается
+        from models.xml_manager import load_athletes_from_xml
         self._athletes = load_athletes_from_xml(filepath)
 
     # --- ЛОГИКА ПОСТРОЧНОГО ВЫВОДА (ПО УМНОМУ ПАГИНАЦИИ) ---

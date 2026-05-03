@@ -1,16 +1,24 @@
 import sys
 from PySide6.QtWidgets import QApplication
+
+from models.model import AthleteModel
 from views.main_window import MainWindow
+from controllers.main_controller import MainController
 
 def main():
-    # Создаем объект приложения
     app = QApplication(sys.argv)
     
-    # Создаем и показываем наше главное окно
-    window = MainWindow()
-    window.show()
+    # 1. Создаем Модель
+    model = AthleteModel()
     
-    # Запускаем бесконечный цикл обработки событий
+    # 2. Создаем Главное Окно (View)
+    view = MainWindow()
+    
+    # 3. Создаем Контроллер и передаем ему Модель и View
+    controller = MainController(view, model)
+    
+    # Показываем интерфейс
+    view.show()
     sys.exit(app.exec())
 
 if __name__ == "__main__":

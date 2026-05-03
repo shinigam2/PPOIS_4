@@ -2,7 +2,7 @@ import os
 import xml.dom.minidom as minidom
 import xml.sax
 from typing import List
-from model import Athlete  # Импортируем наш класс данных из предыдущего шага
+from models.model import Athlete
 
 # ==========================================
 # 1. ЧТЕНИЕ: SAX Парсер
