@@ -4,16 +4,11 @@ from src.utils.descriptor import ValidatedNumber
 
 
 class OrderType(Enum):
-    """Типы торговых заявок."""
     BUY = "BUY"
     SELL = "SELL"
 
 
 class Order:
-    """
-    Класс, представляющий торговую заявку (ордер) на бирже.
-    Хранит информацию о том, кто, что и в каком количестве хочет купить/продать.
-    """
     
     # Количество и цена не могут быть отрицательными или нулевыми
     amount = ValidatedNumber(min_value=0, allow_zero=False)
@@ -26,8 +21,8 @@ class Order:
         self.amount = amount
         self.price = price
 
+    # Возвращает общую стоимость заявки (сумма сделки).
     def get_total_value(self) -> float:
-        """Возвращает общую стоимость заявки (сумма сделки)."""
         return self.amount * self.price
 
     def __str__(self) -> str:

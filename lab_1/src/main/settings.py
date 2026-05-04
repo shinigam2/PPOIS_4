@@ -5,7 +5,6 @@ from src.interface.exchange_manager import ExchangeManager
 
 
 def setup_exchange() -> tuple[ExchangeManager, TradingPlatform, Trader]:
-    """Инициализация стартовых данных для симуляции."""
     
     # 1. Создаем биржу и платформу
     exchange = Exchange(name="Главная Биржа")
@@ -26,7 +25,7 @@ def setup_exchange() -> tuple[ExchangeManager, TradingPlatform, Trader]:
         exchange.add_asset(asset)
 
     # 3. Создаем участников
-    broker = Broker(name="Брокер 'Надежный'", commission_rate=0.02) # Комиссия 2%
+    broker = Broker(name="Брокер 'Надежный'", commission_rate=0.02)
     exchange.register_broker(broker)
 
     trader = Trader(name="Михаил")

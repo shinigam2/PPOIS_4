@@ -6,7 +6,6 @@ from src.interface.exchange_manager import ExchangeManager
 
 
 class ExchangeCLI:
-    """Класс для работы с интерфейсом командной строки."""
 
     def __init__(self, manager: ExchangeManager, platform: TradingPlatform, trader: Trader):
         self.manager = manager
@@ -23,7 +22,6 @@ class ExchangeCLI:
         print("6. Выход")
 
     def run(self) -> None:
-        """Главный цикл работы программы."""
         print(f"Добро пожаловать, {self.trader.name}! Базовая валюта: {self.manager.base_currency}")
         
         while True:
@@ -48,7 +46,6 @@ class ExchangeCLI:
                 else:
                     print("Неверный ввод. Пожалуйста, введите число от 1 до 6.")
             
-            # Перехват наших пользовательских исключений и ошибок ввода
             except ExchangeBaseException as e:
                 print(f"\n[Ошибка Биржи]: {e}")
             except ValueError as e:
@@ -57,16 +54,13 @@ class ExchangeCLI:
                 print(f"\n[Непредвиденная ошибка]: {e}")
 
     def _handle_trade(self, order_type: OrderType) -> None:
-        """Вспомогательный метод для сбора данных о сделке от пользователя."""
         ticker = input("Введите тикер актива (например, USD, AAPL): ").strip().upper()
         amount_str = input("Введите количество: ").strip()
         price_str = input("Введите цену за единицу: ").strip()
 
-        # Преобразуем ввод и ловим ValueError, если ввели не числа
         amount = float(amount_str)
         price = float(price_str)
 
-        # Формируем заявку (операция оформления заявок)
         order = Order(
             trader=self.trader,
             order_type=order_type,
@@ -75,6 +69,5 @@ class ExchangeCLI:
             price=price
         )
 
-        # Передаем заявку менеджеру на исполнение
         result_message = self.manager.process_order(order)
         print("\n[Результат]: " + result_message)

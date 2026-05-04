@@ -3,25 +3,17 @@ from src.exceptions.custom_exceptions import InsufficientFundsError
 
 
 class Portfolio:
-    """
-    Класс для управления активами участника торгов.
-    Хранит балансы валют и акций.
-    """
 
     def __init__(self):
-        # Словарь для хранения балансов активов: {тикер: количество}
         self._balances: Dict[str, float] = {}
 
     def deposit(self, ticker: str, amount: float) -> None:
-        """Пополнение баланса конкретного актива."""
         if amount <= 0:
             raise ValueError("Сумма пополнения должна быть больше нуля.")
         
-        # Если актива еще нет, get вернет 0.0, и мы прибавим amount
         self._balances[ticker] = self._balances.get(ticker, 0.0) + amount
 
     def withdraw(self, ticker: str, amount: float) -> None:
-        """Списание актива с баланса."""
         if amount <= 0:
             raise ValueError("Сумма списания должна быть больше нуля.")
         

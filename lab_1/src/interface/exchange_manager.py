@@ -19,16 +19,15 @@ class ExchangeManager:
         Операция оформления и исполнения торговой заявки.
         Маршрутизирует логику в зависимости от типа ордера (Покупка/Продажа).
         """
-        # Проверяем, существует ли актив на бирже (если нет, биржа выбросит AssetNotFoundError)
+        # Проверяем, существует ли актив на бирже
         asset = self.exchange.get_asset(order.ticker)
         
-        # Защита от попытки купить/продать по цене, отличающейся от рыночной 
         if order.price != asset.price:
             raise InvalidTransactionError(
                 f"Цена в заявке ({order.price}) не совпадает с рыночной ({asset.price})."
             )
 
-        # Вызываем нужный метод и ОБЯЗАТЕЛЬНО возвращаем его результат (return)
+        # Вызываем нужный метод
         if order.order_type == OrderType.BUY:
             return self._execute_buy(order)
         elif order.order_type == OrderType.SELL:
@@ -43,7 +42,7 @@ class ExchangeManager:
         commission = total_cost * broker.commission_rate
         total_deduction = total_cost + commission
 
-        # Проверяем и списываем базовую валюту (например, USD)
+        # Проверяем и списываем базовую валюту
         order.trader.portfolio.withdraw(self.base_currency, total_deduction)
         
         # Начисляем комиссию брокеру
@@ -58,10 +57,7 @@ class ExchangeManager:
     def _execute_sell(self, order: Order) -> str:
         """Внутренний метод для расчетов при продаже."""
         broker = order.trader.get_broker()
-        
-        # Сначала пробуем списать продаваемый актив (если его нет, выпадет ошибка)
         order.trader.portfolio.withdraw(order.ticker, order.amount)
-        
         total_revenue = order.get_total_value()
         commission = total_revenue * broker.commission_rate
         net_revenue = total_revenue - commission
@@ -72,12 +68,10 @@ class ExchangeManager:
         # Начисляем выручку трейдеру
         order.trader.portfolio.deposit(self.base_currency, net_revenue)
 
-        # Обязательно возвращаем строку с результатом
         return (f"Успешно: {order.trader.name} продал {order.amount} '{order.ticker}'. "
                 f"Получено: {net_revenue} {self.base_currency} (удержана комиссия {commission}).")
 
     def get_portfolio_summary(self, trader: Trader) -> str:
-        """Операция управления портфелем: получение сводки балансов."""
         balances = trader.portfolio.get_all_balances()
         if not balances:
             return f"Портфель трейдера {trader.name} пуст."
@@ -87,15 +81,11 @@ class ExchangeManager:
             lines.append(f" - {ticker}: {amount}")
         return "\n".join(lines)
 
+    # Делегирование операции анализа рынка торговой платформе.
     def analyze_market(self, platform: TradingPlatform) -> str:
-        """Делегирование операции анализа рынка торговой платформе."""
         return platform.get_market_data()
     
     def simulate_market_tick(self) -> str:
-        """
-        Делегирует симуляцию рыночного тика в доменный слой.
-        Возвращает отформатированную строку для вывода в CLI.
-        """
         changes = self.exchange.simulate_market_tick()
         
         if not changes:
