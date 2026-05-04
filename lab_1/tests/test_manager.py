@@ -1,7 +1,5 @@
 import unittest
 
-# Импортируем наши классы (предполагается, что структура папок соблюдена)
-# Если тестируешь в одном файле exchange_project.py, импортируй из него:
 # from exchange_project import Exchange, Stock, Broker, Trader, ExchangeManager, Order, OrderType, InsufficientFundsError, InvalidTransactionError
 
 from src.core.exchange import Exchange, TradingPlatform
