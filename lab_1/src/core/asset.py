@@ -10,13 +10,18 @@ class Asset(ABC):
     Реализует общую логику: тикер, название и цену.
     """
     
-    # Используем дескриптор для защиты цены (не может быть отрицательной или нулевой)
     price = ValidatedNumber(min_value=0, allow_zero=False)
 
     def __init__(self, ticker: str, name: str, initial_price: float):
         self.ticker = ticker
         self.name = name
+        self._initial_price = initial_price  # Запоминаем базовое знач
         self.price = initial_price
+
+    @property
+    def initial_price(self) -> float:
+        """Возвращает исходную цену актива (не изменяется в процессе симуляции)."""
+        return self._initial_price
 
     @abstractmethod
     def get_asset_info(self) -> str:
@@ -24,8 +29,8 @@ class Asset(ABC):
         pass
 
     def update_price(self, new_price: float) -> None:
-        """Обновляет текущую цену (или значение) актива."""
-        self.price = new_price
+        """Обновляет текущую цену актива. Округляет до сотых для финансовой точности."""
+        self.price = round(new_price, 2)
 
     def __str__(self) -> str:
         return f"{self.ticker} - {self.price}"
@@ -60,7 +65,7 @@ class Stock(Asset):
 class MarketIndex(Asset):
     """
     Класс, представляющий рыночный индекс. 
-    Агрегирует другие активы для анализа рынка.
+    Объединяет другие активы для анализа рынка.
     """
 
     def __init__(self, ticker: str, name: str, initial_value: float):

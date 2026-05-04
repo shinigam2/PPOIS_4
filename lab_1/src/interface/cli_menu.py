@@ -19,7 +19,8 @@ class ExchangeCLI:
         print("2. Мой портфель")
         print("3. Купить актив")
         print("4. Продать актив")
-        print("5. Выход")
+        print("5. Обновление цен")
+        print("6. Выход")
 
     def run(self) -> None:
         """Главный цикл работы программы."""
@@ -27,7 +28,7 @@ class ExchangeCLI:
         
         while True:
             self.display_menu()
-            choice = input("Выберите действие (1-5): ").strip()
+            choice = input("Выберите действие (1-6): ").strip()
 
             try:
                 if choice == '1':
@@ -39,10 +40,13 @@ class ExchangeCLI:
                 elif choice == '4':
                     self._handle_trade(OrderType.SELL)
                 elif choice == '5':
+                    print("\n" + self.manager.simulate_market_tick())
+                    input("\nНажмите Enter для возврата в меню...")
+                elif choice == '6':
                     print("Завершение работы. До свидания!")
                     break
                 else:
-                    print("Неверный ввод. Пожалуйста, введите число от 1 до 5.")
+                    print("Неверный ввод. Пожалуйста, введите число от 1 до 6.")
             
             # Перехват наших пользовательских исключений и ошибок ввода
             except ExchangeBaseException as e:

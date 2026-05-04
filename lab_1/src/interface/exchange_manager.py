@@ -90,3 +90,22 @@ class ExchangeManager:
     def analyze_market(self, platform: TradingPlatform) -> str:
         """Делегирование операции анализа рынка торговой платформе."""
         return platform.get_market_data()
+    
+    def simulate_market_tick(self) -> str:
+        """
+        Делегирует симуляцию рыночного тика в доменный слой.
+        Возвращает отформатированную строку для вывода в CLI.
+        """
+        changes = self.exchange.simulate_market_tick()
+        
+        if not changes:
+            return "Нет активов для обновления."
+        
+        lines = ["Обновление цен завершено:", "-" * 40]
+        for ticker, (old, new) in changes.items():
+            delta = ((new - old) / old) * 100 if old != 0 else 0
+            arrow = "^" if delta >= 0 else "v"
+            lines.append(f"{arrow} {ticker}: {old:.2f} → {new:.2f} ({delta:+.1f}%)")
+        lines.append("-" * 40)
+        
+        return "\n".join(lines)
