@@ -38,7 +38,6 @@ class Trader(Participant):
         self._broker: Optional[Broker] = None
     # Привязывает трейдера к брокеру
     def set_broker(self, broker: Broker) -> None:
-        """Привязывает трейдера к брокеру (вызывается самим брокером при регистрации)."""
         self._broker = broker
 
     def get_broker(self) -> Broker:

@@ -15,10 +15,6 @@ class ExchangeManager:
         self.base_currency = base_currency
 
     def process_order(self, order: Order) -> str:
-        """
-        Операция оформления и исполнения торговой заявки.
-        Маршрутизирует логику в зависимости от типа ордера (Покупка/Продажа).
-        """
         # Проверяем, существует ли актив на бирже
         asset = self.exchange.get_asset(order.ticker)
         
@@ -27,7 +23,6 @@ class ExchangeManager:
                 f"Цена в заявке ({order.price}) не совпадает с рыночной ({asset.price})."
             )
 
-        # Вызываем нужный метод
         if order.order_type == OrderType.BUY:
             return self._execute_buy(order)
         elif order.order_type == OrderType.SELL:
@@ -36,36 +31,29 @@ class ExchangeManager:
             raise ValueError("Неизвестный тип заявки.")
 
     def _execute_buy(self, order: Order) -> str:
-        """Внутренний метод для расчетов при покупке."""
         broker = order.trader.get_broker()
         total_cost = order.get_total_value()
         commission = total_cost * broker.commission_rate
         total_deduction = total_cost + commission
 
-        # Проверяем и списываем базовую валюту
         order.trader.portfolio.withdraw(self.base_currency, total_deduction)
-        
-        # Начисляем комиссию брокеру
+
         broker.portfolio.deposit(self.base_currency, commission)
         
-        # Начисляем купленный актив трейдеру
         order.trader.portfolio.deposit(order.ticker, order.amount)
 
         return (f"Успешно: {order.trader.name} купил {order.amount} '{order.ticker}'. "
                 f"Списано: {total_deduction} {self.base_currency} (вкл. комиссию {commission}).")
 
     def _execute_sell(self, order: Order) -> str:
-        """Внутренний метод для расчетов при продаже."""
         broker = order.trader.get_broker()
         order.trader.portfolio.withdraw(order.ticker, order.amount)
         total_revenue = order.get_total_value()
         commission = total_revenue * broker.commission_rate
         net_revenue = total_revenue - commission
 
-        # Начисляем комиссию брокеру
         broker.portfolio.deposit(self.base_currency, commission)
         
-        # Начисляем выручку трейдеру
         order.trader.portfolio.deposit(self.base_currency, net_revenue)
 
         return (f"Успешно: {order.trader.name} продал {order.amount} '{order.ticker}'. "
