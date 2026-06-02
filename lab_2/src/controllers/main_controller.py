@@ -55,7 +55,7 @@ class MainController:
 
     def handle_add_record(self):
         dialog = AddAthleteDialog(self.view)
-        if dialog.exec():  # Если нажали "ОК"
+        if dialog.exec():
             data = dialog.get_data()
             if not data["full_name"] or not data["sport_type"]:
                 QMessageBox.warning(self.view, "Ошибка", "ФИО и Вид спорта не могут быть пустыми!")
@@ -65,7 +65,7 @@ class MainController:
             new_athlete = Athlete(**data)
             self.model.add_athlete(new_athlete)
             
-            # Обновляем таблицу (переходим на последнюю страницу, чтобы увидеть добавленное)
+            # Обновляем таблицу
             self.last_page() 
 
     def handle_save_file(self):
