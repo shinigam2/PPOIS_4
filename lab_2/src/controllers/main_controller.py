@@ -10,7 +10,7 @@ class MainController:
         self.view = view
         self.model = model
         
-        # Настройки пагинации
+
         self.current_page = 1
         self.items_per_page = int(self.view.combo_items_per_page.currentText())
 
@@ -19,14 +19,13 @@ class MainController:
 
     def _connect_signals(self):
         """Связываем сигналы от кнопок UI с методами контроллера"""
-        # Меню и Тулбар
+
         self.view.action_add.triggered.connect(self.handle_add_record)
         self.view.action_save.triggered.connect(self.handle_save_file)
         self.view.action_load.triggered.connect(self.handle_load_file)
         self.view.action_search.triggered.connect(self.handle_search)
         self.view.action_delete.triggered.connect(self.handle_delete)
-        
-        # Сигналы пагинации
+
         self.view.btn_next.clicked.connect(self.next_page)
         self.view.btn_prev.clicked.connect(self.prev_page)
         self.view.btn_first.clicked.connect(self.first_page)
@@ -37,13 +36,12 @@ class MainController:
         """Получает нужную страницу из Модели и передает во View"""
         total_pages = self.model.get_total_pages(self.items_per_page)
         
-        # Защита от выхода за пределы страниц
+
         if self.current_page > total_pages and total_pages > 0:
             self.current_page = total_pages
         elif self.current_page < 1:
             self.current_page = 1
 
-        # Получаем данные для текущей страницы
         page_data = self.model.get_page(self.current_page, self.items_per_page)
         
         # Обновляем UI
@@ -54,7 +52,6 @@ class MainController:
             self.model.get_total_count()
         )
 
-    # --- Обработчики действий ---
 
     def handle_add_record(self):
         dialog = AddAthleteDialog(self.view)
@@ -84,7 +81,6 @@ class MainController:
             self.current_page = 1
             self.update_table_view()
 
-    # --- Методы пагинации ---
 
     def next_page(self):
         total_pages = self.model.get_total_pages(self.items_per_page)

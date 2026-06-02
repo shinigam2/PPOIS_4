@@ -13,7 +13,6 @@ class Athlete:
 
 class AthleteModel:
     def __init__(self):
-        # Инкапсулируем массив записей
         self._athletes: List[Athlete] = []
 
     def add_athlete(self, athlete: Athlete):
@@ -26,7 +25,7 @@ class AthleteModel:
         self._athletes = athletes
 
     def clear(self):
-        self._athletes.append([])
+        self._athletes.append()
 
     def save_to_file(self, filepath: str):
         # Импортируем только тогда, когда метод вызывается
@@ -34,11 +33,9 @@ class AthleteModel:
         save_athletes_to_xml(filepath, self._athletes)
 
     def load_from_file(self, filepath: str):
-        # Импортируем только тогда, когда метод вызывается
         from models.xml_manager import load_athletes_from_xml
         self._athletes = load_athletes_from_xml(filepath)
 
-    # --- ЛОГИКА ПОСТРОЧНОГО ВЫВОДА (ПО УМНОМУ ПАГИНАЦИИ) ---
     
     def get_page(self, page_number: int, items_per_page: int, data_source: Optional[List[Athlete]] = None) -> List[Athlete]:
         """Возвращает срез массива для конкретной страницы."""
@@ -52,7 +49,6 @@ class AthleteModel:
         data = data_source if data_source is not None else self._athletes
         if not data:
             return 1
-        # Округление вверх при делении
         return (len(data) + items_per_page - 1) // items_per_page
 
     def get_total_count(self, data_source: Optional[List[Athlete]] = None) -> int:
@@ -60,7 +56,6 @@ class AthleteModel:
         data = data_source if data_source is not None else self._athletes
         return len(data)
 
-    # --- ЛОГИКА ПОИСКА (Вариант 7) ---
 
     def search(self, 
                full_name: str = "", 
@@ -68,10 +63,6 @@ class AthleteModel:
                min_titles: Optional[int] = None, 
                max_titles: Optional[int] = None, 
                rank: str = "") -> List[Athlete]:
-        """
-        Универсальный метод поиска. Если переданы параметры для конкретного критерия,
-        ищет по ним.
-        """
         results = []
         for athlete in self._athletes:
             match = False
@@ -103,18 +94,15 @@ class AthleteModel:
             if match:
                 results.append(athlete)
                 
-        # Если ничего не ввели, возвращаем пустой список (или можно возвращать все)
         return results
         
-    # --- ЛОГИКА УДАЛЕНИЯ ---
-    
+
     def delete_records(self, records_to_delete: List[Athlete]) -> int:
         """
         Удаляет переданные записи из массива. 
         Возвращает количество удаленных записей.
         """
         initial_count = len(self._athletes)
-        # Оставляем только тех спортсменов, которых нет в списке на удаление
         self._athletes = [a for a in self._athletes if a not in records_to_delete]
         
         deleted_count = initial_count - len(self._athletes)

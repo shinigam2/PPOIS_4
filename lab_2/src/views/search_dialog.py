@@ -18,7 +18,6 @@ class SearchDialog(QDialog):
 
         self.layout = QVBoxLayout(self)
 
-        # --- 1. Вкладки с условиями поиска ---
         self.tabs = QTabWidget()
         
         # Вкладка 1: По ФИО ИЛИ виду спорта
@@ -55,11 +54,9 @@ class SearchDialog(QDialog):
 
         self.layout.addWidget(self.tabs)
 
-        # Кнопка Искать
         self.btn_search = QPushButton("Найти")
         self.layout.addWidget(self.btn_search)
 
-        # --- 2. Таблица результатов ---
         self.table = QTableWidget()
         self.table.setColumnCount(6)
         self.table.setHorizontalHeaderLabels([
@@ -68,7 +65,6 @@ class SearchDialog(QDialog):
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         self.layout.addWidget(self.table)
 
-        # --- 3. Панель пагинации ---
         pagination_layout = QHBoxLayout()
         self.btn_prev = QPushButton("< Пред.")
         self.btn_next = QPushButton("След. >")
@@ -79,7 +75,6 @@ class SearchDialog(QDialog):
         pagination_layout.addWidget(self.btn_next)
         self.layout.addLayout(pagination_layout)
 
-        # Подключение кнопок пагинации (будут работать с локальным массивом search_results)
         self.btn_prev.clicked.connect(self.prev_page)
         self.btn_next.clicked.connect(self.next_page)
 
@@ -94,7 +89,6 @@ class SearchDialog(QDialog):
             return {"full_name": self.edit_name3.text(), "rank": self.combo_rank.currentText()}
         return {}
 
-    # --- Логика пагинации ВНУТРИ диалога ---
     def set_results(self, results: list):
         """Контроллер передает сюда найденный массив"""
         self.search_results = results

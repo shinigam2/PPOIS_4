@@ -4,9 +4,8 @@ import xml.sax
 from typing import List
 from models.model import Athlete
 
-# ==========================================
-# 1. ЧТЕНИЕ: SAX Парсер
-# ==========================================
+
+
 class AthleteSAXHandler(xml.sax.ContentHandler):
     """
     Обработчик событий для SAX парсера.
@@ -19,19 +18,16 @@ class AthleteSAXHandler(xml.sax.ContentHandler):
         self.current_element = ""
         self.current_data = ""
 
-    # Срабатывает при открытии тега (например, <athlete> или <full_name>)
     def startElement(self, tag, attributes):
         self.current_element = tag
         self.current_data = ""
         if tag == "athlete":
             self.current_athlete_data = {}
 
-    # Срабатывает при чтении текста между тегами
     def characters(self, content):
-        # SAX может читать текст кусками, поэтому аккумулируем его
+        # SAX может читать текст кусками, поэтому +=
         self.current_data += content
 
-    # Срабатывает при закрытии тега (например, </full_name>)
     def endElement(self, tag):
         text = self.current_data.strip()
         if tag == "full_name":
@@ -41,14 +37,12 @@ class AthleteSAXHandler(xml.sax.ContentHandler):
         elif tag == "position":
             self.current_athlete_data['position'] = text
         elif tag == "titles_count":
-            # Строгое требование задания: используем правильные типы (int)
             self.current_athlete_data['titles_count'] = int(text) if text.isdigit() else 0
         elif tag == "sport_type":
             self.current_athlete_data['sport_type'] = text
         elif tag == "rank":
             self.current_athlete_data['rank'] = text
         elif tag == "athlete":
-            # Тег спортсмена закрылся, значит мы собрали все его данные
             athlete = Athlete(**self.current_athlete_data)
             self.athletes.append(athlete)
         
@@ -65,9 +59,8 @@ def load_athletes_from_xml(filepath: str) -> List[Athlete]:
     return handler.athletes
 
 
-# ==========================================
-# 2. ЗАПИСЬ: DOM Парсер
-# ==========================================
+
+
 def save_athletes_to_xml(filepath: str, athletes: List[Athlete]):
     """
     Создает XML-дерево в памяти с помощью DOM и сохраняет в файл.
@@ -77,7 +70,7 @@ def save_athletes_to_xml(filepath: str, athletes: List[Athlete]):
     
     # Создаем корневой элемент
     root = doc.createElement("athletes")
-    doc.appendChild(root)
+    doc.appendChild(root) # Прикрепили корень к документу
     
     for athlete in athletes:
         # Создаем тег <athlete>
